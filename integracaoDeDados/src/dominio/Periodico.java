@@ -4,6 +4,7 @@ public final class Periodico extends Artigo{
 	private String nome_periodico;
 	private String nro_edicao;
 	private static final String tipo = "periodico";
+	//private String tipo;
 	
 	
 	public Periodico(String cod_publicacao, String titulo, String mes, String ano, String url, 
@@ -21,6 +22,7 @@ public final class Periodico extends Artigo{
 		this.qualis = qualis;
 		this.nome_periodico = nome_periodico;
 		this.nro_edicao = nro_edicao;
+		//this.tipo = "periodico";
 	}
 	
 	public Periodico(){
@@ -46,5 +48,9 @@ public final class Periodico extends Artigo{
 	public String getTipo(){
 		return tipo;
 	}
+	
+	/*public void setTipo(String tipo){
+		this.tipo = tipo;
+	}*/
 
 }
