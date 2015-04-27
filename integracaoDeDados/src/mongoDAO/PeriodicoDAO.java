@@ -16,7 +16,6 @@ public class PeriodicoDAO {
 	MongoDB mongo = new MongoDB();
 	DBCollection coll = null;
 	
-	
 	public PeriodicoDAO(){
 		coll = mongo.publicacoes();
 	}

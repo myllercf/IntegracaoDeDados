@@ -24,6 +24,10 @@ public final class Mestrando extends Aluno{
 		this.ano_ingresso =ano_ingresso;
 		this.data_ingresso = data_ingresso;
 	}
+	
+	public Mestrando(){
+		
+	}
 
 	/*public String getSemestre_ingresso() {
 		return semestre_ingresso;
