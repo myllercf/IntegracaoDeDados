@@ -31,7 +31,7 @@ public class TesteDAO {
 		System.out.println("gravou");*/
 		
 	    Periodico per2 = new Periodico();
-		System.out.println("buscando:");
+	    System.out.println("vamos ver...");
 		//per2 = dao.buscarPorCodigo("001");
 		//per2 = dao.buscarPorCampo("qualis", "B1");
 		/*System.out.println(per2.getCod_publicacao());
@@ -63,13 +63,12 @@ public class TesteDAO {
 		}*/
 		
 		//teste da classe Mestrando
-		System.out.println("vamos ver...");
 		MestrandoDAO mestre = new MestrandoDAO();
 		//inserindo
 		/*Mestrando msc = new Mestrando("_id", "rg", "data_nascimento", "naturalidade", "nacionalidade", "usuario", "senha", "perfil", "email", 
-				"url", "RA", "cod_situacao", "info_complementares", "semestre_ingresso", "ano_ingresso", "data_ingresso");*/
-		Mestrando msc2 = new Mestrando("01234567899", "9876543", "um dia desses", "bem ali", "daqui mesmo", "usuario", "senha", "perfil", "email", 
 				"url", "RA", "cod_situacao", "info_complementares", "semestre_ingresso", "ano_ingresso", "data_ingresso");
+		Mestrando msc2 = new Mestrando("01234567899", "9876543", "um dia desses", "bem ali", "daqui mesmo", "usuario", "senha", "perfil", "email", 
+				"url", "RA", "cod_situacao", "info_complementares", "semestre_ingresso", "ano_ingresso", "data_ingresso");*/
 		
 		//mestre.inserir(msc2);
 		
@@ -80,10 +79,21 @@ public class TesteDAO {
 		List<Mestrando> mestrandos = new ArrayList<Mestrando>();
 		mestrandos = mestre.buscarPorCampo("usuario", "usuario");
 		for(int i=0; i<mestrandos.size(); i++){
-			System.out.println(mestrandos.get(i).getCPF());
+			System.out.println((i+1) + " " + mestrandos.get(i).getSenha());
 		}
 		
-		System.out.println("aewwww");
+		//System.out.println("senha a ser persistida: " + msc2.getSenha());
+		
+		//atualizando
+		/*System.out.println("atualizando");
+		//mestre.atualizar("01234567899", msc2);
+		System.out.println("senha real: " + mestre.buscarPorCPF("01234567899").getSenha());*/
+		
+		//insercao com publicacoes
+		Mestrando msc2 = new Mestrando("01234567899", "9876543", "um dia desses", "bem ali", "daqui mesmo", "usuario", "senha", "perfil", "email", 
+				"url", "RA", "cod_situacao", "info_complementares", "semestre_ingresso", "ano_ingresso", "data_ingresso");
+		
+		//System.out.println("aewwww");
 	}
 
 }

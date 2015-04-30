@@ -1,12 +1,15 @@
 package dominio;
 
+import java.util.List;
+
 public final class Mestrando extends Aluno{
 	private static final String tipo = "mestrando";
+	private List<Publicacao> publicacoes;
 	
 	public Mestrando(String CPF, String RG, String data_nascimento, String naturalidade, String nacionalidade, String usuario, 
 			String senha, String perfil, String email, String url, 
 			String RA, String cod_situacao, String info_complementares, 
-			String semestre_ingresso, String ano_ingresso, String data_ingresso){
+			String semestre_ingresso, String ano_ingresso, String data_ingresso, List<Publicacao> publicacoes){
 		this.CPF = CPF;
 		this.RG = RG;
 		this.data_nascimento = data_nascimento;
@@ -23,6 +26,7 @@ public final class Mestrando extends Aluno{
 		this.semestre_ingresso = semestre_ingresso;
 		this.ano_ingresso =ano_ingresso;
 		this.data_ingresso = data_ingresso;
+		this.publicacoes = publicacoes;
 	}
 	
 	public Mestrando(){
@@ -52,6 +56,14 @@ public final class Mestrando extends Aluno{
 	public void setData_ingresso(String data_ingresso) {
 		this.data_ingresso = data_ingresso;
 	}*/
+	
+	public List<Publicacao> getPublicacoes(){
+		return publicacoes;
+	}
+	
+	public void setPublicacoes(List<Publicacao> publicacoes){
+		this.publicacoes = publicacoes;
+	}
 	
 	public String getTipo(){
 		return tipo;

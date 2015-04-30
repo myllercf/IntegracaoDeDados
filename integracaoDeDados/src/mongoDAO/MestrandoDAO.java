@@ -11,6 +11,7 @@ import com.mongodb.DBObject;
 import conexoes.MongoDB;
 import dominio.Mestrando;
 import dominio.Periodico;
+import dominio.Publicacao;
 
 public class MestrandoDAO {
 	MongoDB mongo = new MongoDB();
@@ -21,6 +22,12 @@ public class MestrandoDAO {
 	}
 	
 	public void inserir(Mestrando m){
+		/*List<Publicacao> pub = null;
+		PeriodicoDAO publicacao = new PeriodicoDAO();
+		for(int i=0; i<m.getPublicacoes().size(); i++){
+			pub.add(m.getPublicacoes().get(i));
+		}*/
+		
 		BasicDBObject doc = new BasicDBObject("_id", m.getCPF())
     	.append("rg", m.getRG())
     	.append("data_nascimento", m.getData_nascimento())
@@ -37,6 +44,7 @@ public class MestrandoDAO {
     	.append("semestre_ingresso", m.getSemestre_ingresso())
     	.append("ano_ingresso", m.getAno_ingresso())
     	.append("data_ingresso", m.getData_ingresso())
+    	//.append("publicacoes", m.getPublicacoes())
     	.append("tipo", m.getTipo());
     coll.insert(doc);
 	}
@@ -97,6 +105,32 @@ public class MestrandoDAO {
     		periodicos.add(msc);
 	    }
 	    return periodicos;	    
+	}
+	
+	public void atualizar(String cod, Mestrando m){
+		Periodico per = new Periodico();
+		BasicDBObject query = new BasicDBObject("_id", cod);
+		
+		BasicDBObject doc = new BasicDBObject("_id", m.getCPF())
+    	.append("rg", m.getRG())
+    	.append("data_nascimento", m.getData_nascimento())
+    	.append("naturalidade", m.getNaturalidade())
+    	.append("nacionalidade", m.getNacionalidade())
+    	.append("usuario", m.getUsuario())
+    	.append("senha", m.getSenha())
+    	.append("perfil", m.getPerfil())
+    	.append("email", m.getEmail())
+    	.append("url", m.getUrl())
+    	.append("ra", m.getRA())
+    	.append("cod_situacao", m.getCod_situacao())
+    	.append("info_complementares", m.getInfo_complementares())
+    	.append("semestre_ingresso", m.getSemestre_ingresso())
+    	.append("ano_ingresso", m.getAno_ingresso())
+    	.append("data_ingresso", m.getData_ingresso())
+    	.append("tipo", m.getTipo());
+		
+	    //DBCursor cursor = coll.find(query);
+		DBObject cursor = coll.findAndModify(query, doc);		
 	}
 
 }
