@@ -73,7 +73,7 @@ public class TesteTabMongo {
 		DBr.add(tab3);
 		DBr.add(tab4);
 		
-		System.out.println(tab2.getReferencias().size());
+		//System.out.println(tab2.getReferencias().size());
 		for(Tabela t: tabMong.tabelasFinais(DBr)){
 			System.out.println("resultados:");
 			System.out.println(t.getNome());
