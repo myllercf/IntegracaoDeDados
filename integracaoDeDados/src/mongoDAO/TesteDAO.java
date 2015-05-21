@@ -90,9 +90,9 @@ public class TesteDAO {
 		System.out.println("senha real: " + mestre.buscarPorCPF("01234567899").getSenha());*/
 		
 		//insercao com publicacoes
-		Mestrando msc2 = new Mestrando("01234567899", "9876543", "um dia desses", "bem ali", "daqui mesmo", "usuario", "senha", "perfil", "email", 
+		/*Mestrando msc2 = new Mestrando("01234567899", "9876543", "um dia desses", "bem ali", "daqui mesmo", "usuario", "senha", "perfil", "email", 
 				"url", "RA", "cod_situacao", "info_complementares", "semestre_ingresso", "ano_ingresso", "data_ingresso");
-		
+		*/
 		//System.out.println("aewwww");
 	}
 

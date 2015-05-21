@@ -10,19 +10,28 @@ import java.util.Scanner;
 public class Exemplo {
 	
 	public static void main(String[] args) {
-		File file = new File("C:/Users/mcf/Documents/IntegracaoDeDados/IntegracaoDeDados/teste.txt");
+		//File file = new File("C:/Users/mcf/Documents/IntegracaoDeDados/IntegracaoDeDados/teste.txt");
 		//File file = new File("teste.txt");
 		//File file = new File("C:\Users\mcf\Documents\IntegracaoDeDados\IntegracaoDeDados\teste.txt");
+		File file = new File("/home/myller/esquema.txt");
 		
 		try{
 			FileReader reader = new FileReader(file);
 			BufferedReader input = new BufferedReader(reader);
 			String linha;
 			
-			while ((linha = input.readLine()) != null){
+			/*while ((linha = input.readLine()) != null){
 				System.out.println(linha);
-			}
-			
+			}*/
+			String str;
+			 StringBuffer buf = new StringBuffer();
+			 while (input.ready()) {
+			  str = input.readLine();
+			  buf.append(str);
+			 }
+			 //teste
+			 System.out.println(buf.substring( 13+buf.indexOf("create table "), buf.indexOf("(") ));
+			 
 			input.close();
 		} catch (IOException e){
 			System.out.println(e);
