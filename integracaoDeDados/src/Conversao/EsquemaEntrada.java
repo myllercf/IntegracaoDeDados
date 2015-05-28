@@ -52,12 +52,13 @@ public class EsquemaEntrada {
 				while(texto.charAt(0) == ' ' || texto.charAt(0) == '\n' || texto.charAt(0) == '\t'){
 					texto.deleteCharAt(0);
 				}
-				System.out.println(texto);
+				//System.out.println(texto);
 				//checar chave d novo
 				if(texto.indexOf("primary") == 0 || texto.indexOf("foreing") == 0){
 					break;
 				}
 				atributos.add(texto.substring( 0, texto.indexOf(" ") ) );
+				System.out.println(texto.substring( 0, texto.indexOf(" ")));
 				//System.out.println("sendo apagado:"+texto.substring(0, texto.indexOf(",")+1));
 				texto.delete(0, texto.indexOf(",")+1);
 			}
@@ -68,10 +69,11 @@ public class EsquemaEntrada {
 			
 			//pegando chave primaria
 			if(texto.substring(0, texto.indexOf("(")).replaceAll(" ","").equals("primarykey")){
-				tabela.setPrimaryKey(texto.substring(texto.indexOf("(")+1, texto.indexOf(")")));
+				//refazer primary key
+				//tabela.setPrimaryKey(texto.substring(texto.indexOf("(")+1, texto.indexOf(")")));
 				texto.delete(0, texto.indexOf(")")+1);
 			}
-			tabela.setAtributos(atributos);
+			tabela.setCampos(atributos);
 			tabelas.add(tabela);
 		}
 		System.out.println("foi aqui");
@@ -84,6 +86,7 @@ public class EsquemaEntrada {
 		while( texto.indexOf("create table") > 0){
 			Tabela tab = new Tabela();
 			tab.setNome(texto.substring(texto.indexOf("create table")+12, texto.indexOf("(")).replaceAll(" ", ""));
+			texto.delete(0, texto.indexOf("(")+1);
 			System.out.println(texto.substring(texto.indexOf("create table")+12, texto.indexOf("(")).replaceAll(" ", ""));
 		}
 		//tabelas.add(tab);
