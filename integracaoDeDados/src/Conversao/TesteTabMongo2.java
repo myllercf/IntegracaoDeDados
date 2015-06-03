@@ -1,9 +1,21 @@
 package Conversao;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JOptionPane;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
+import com.mongodb.DBRef;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+
+import conexoes.MongoDB;
 
 public class TesteTabMongo2 {
 
@@ -25,6 +37,165 @@ public class TesteTabMongo2 {
 				tab.setReferencias(refe);
 				tab.setNome("");
 		
+				
+				
+				//PUBLICACAO
+				List<String> camp1x = new ArrayList();
+				camp1x.add("titulo");
+				camp1x.add("mes");
+				camp1x.add("ano");
+				camp1x.add("url");
+				List<String> primary1x = new ArrayList();
+				primary1x.add("cod_publicacao");
+				Tabela tab1x = new Tabela(); 
+				tab1x.setNome("T_PUBLICACAO");
+				tab1x.setCampos(camp1x);
+				tab1x.setPrimaryKey(primary1x);
+				tab1x.setPrincipal(true);
+				
+				//RELATORIO_TECNICO
+				List<String> camp2x = new ArrayList();
+				camp2x.add("nro_paginas");
+				List<String> primary2x = new ArrayList();
+				primary2x.add("numero");
+				List<String> foreign2x = new ArrayList();
+				foreign2x.add("cod_publicacao");
+				List<String> refs2x = new ArrayList();
+				refs2x.add("T_PUBLICACAO");		
+				Tabela tab2x = new Tabela(); 
+				tab2x.setNome("T_RELATORIO_TECNICO");
+				tab2x.setCampos(camp2x);
+				tab2x.setPrimaryKey(primary2x);
+				tab2x.setForeignKey(foreign2x);
+				tab2x.setReferencias(refs2x);
+				
+				//ARTIGO
+				List<String> camp3x = new ArrayList();
+				camp3x.add("volume");
+				camp3x.add("pagina_inicial");
+				camp3x.add("pagina_final");
+				camp3x.add("circulacao");
+				camp3x.add("qualis");
+				List<String> primary3x = new ArrayList();
+				primary3x.add("cod_publicacao");
+				List<String> foreign3x = new ArrayList();
+				foreign3x.add("cod_publicacao");
+				List<String> refs3x = new ArrayList();
+				refs3x.add("T_PUBLICACAO");		
+				Tabela tab3x = new Tabela(); 
+				tab3x.setNome("T_ARTIGO");
+				tab3x.setPrimaryKey(primary3x);
+				tab3x.setCampos(camp3x);
+				tab3x.setForeignKey(foreign3x);
+				tab3x.setReferencias(refs3x);
+				
+				//ARTIGO_CONFERENCIA
+				List<String> camp4x = new ArrayList();
+				camp4x.add("titulo_anais");
+				camp4x.add("cidade");
+				camp4x.add("pais");
+				List<String> primary4x = new ArrayList();
+				primary4x.add("cod_publicacao");
+				List<String> foreign4x = new ArrayList();
+				foreign4x.add("cod_publicacao");
+				List<String> refs4x = new ArrayList();
+				refs4x.add("T_ARTIGO");		
+				Tabela tab4x = new Tabela(); 
+				tab4x.setNome("T_ARTIGO_CONFERENCIA");
+				tab4x.setCampos(camp4x);
+				tab4x.setPrimaryKey(primary4x);
+				tab4x.setForeignKey(foreign4x);
+				tab4x.setReferencias(refs4x);
+				
+				List<Tabela> DBr = new ArrayList();
+				DBr.add(tab1x);
+				DBr.add(tab2x);
+				DBr.add(tab3x);
+				DBr.add(tab4x);
+				
+				
+				//inserts Publicacao
+						List<String> campPub1x = new ArrayList();
+						campPub1x.add("Object Database systems: a survey");
+						campPub1x.add("02");
+						campPub1x.add("2002");
+						campPub1x.add(null);
+						List<String> prima1x = new ArrayList();
+						prima1x.add("001");
+						TabelaInsert ins1x = new TabelaInsert();
+						ins1x.setTabela("T_PUBLICACAO");
+						ins1x.setAtributos(campPub1x);
+						ins1x.setPrimaryKey(prima1x);
+						
+						List<String> campPub2x = new ArrayList();
+						campPub2x.add("Protocolos de roteamento para redes ad hoc");
+						campPub2x.add("05");
+						campPub2x.add("2000");
+						campPub2x.add(null);
+						List<String> prima2x = new ArrayList();
+						prima2x.add("002");
+						TabelaInsert ins2x = new TabelaInsert();
+						ins2x.setTabela("T_PUBLICACAO");
+						ins2x.setAtributos(campPub2x);
+						ins2x.setPrimaryKey(prima2x);
+						
+						//insert T_RELATORIO_TECNICO
+						List<String> relax = new ArrayList();
+						relax.add("30");
+						List<String> rprima1x = new ArrayList();
+						rprima1x.add("TRIC09");
+						List<String> fore1x = new ArrayList();
+						fore1x.add("002");
+						TabelaInsert ins3x = new TabelaInsert();
+						ins3x.setTabela("T_RELATORIO_TECNICO");
+						ins3x.setAtributos(relax);
+						ins3x.setPrimaryKey(rprima1x);
+						ins3x.setForeignKey(fore1x);
+						
+						//artigo
+						List<String> capartx = new ArrayList();
+						capartx.add("1");
+						capartx.add("30");
+						capartx.add("38");
+						capartx.add("I");
+						capartx.add("A");
+						List<String> primaartx = new ArrayList();
+						primaartx.add("001");
+						List<String> fore4x = new ArrayList();
+						fore4x.add("001");
+						TabelaInsert ins4x = new TabelaInsert();
+						ins4x.setTabela("T_ARTIGO");
+						ins4x.setAtributos(capartx);
+						ins4x.setPrimaryKey(primaartx);
+						ins4x.setForeignKey(fore4x);
+						
+						//insert T_ARTIGO_CONFERENCIA
+						List<String> conf1x = new ArrayList();
+						conf1x.add("Internation Conference on Database Sysstems");
+						conf1x.add("Berlim");
+						conf1x.add("Alemanha");
+						List<String> primaconfx = new ArrayList();
+						primaconfx.add("001");
+						List<String> fore2x = new ArrayList();
+						fore2x.add("001");
+						TabelaInsert ins5x = new TabelaInsert();
+						ins5x.setTabela("T_ARTIGO_CONFERENCIA");
+						ins5x.setAtributos(conf1x);
+						ins5x.setPrimaryKey(primaconfx);
+						ins5x.setForeignKey(fore2x);
+						
+						List<TabelaInsert> inserts = new ArrayList();
+						inserts.add(ins1x);
+						inserts.add(ins2x);
+						inserts.add(ins3x);
+						inserts.add(ins4x);
+						inserts.add(ins5x);		
+		
+				
+		//-----------------------------
+		
+				
+				
 		//Pessoa
 		List<String> camp1 = new ArrayList(); 
 		camp1.add("rg");
@@ -43,6 +214,7 @@ public class TesteTabMongo2 {
 		tab1.setCampos(camp1);
 		tab1.setPrimaryKey(prima1);
 		tab1.setNome("T_PESSOA");
+		tab1.setPrincipal(true);
 		//tab1.setPrincipal(true);
 		
 		//Aluno
@@ -148,7 +320,7 @@ public class TesteTabMongo2 {
 		tab7.setNome("T_PROFESSOR_VISITANTE");
 		
 		
-		List<Tabela> DBr = new ArrayList();
+		//List<Tabela> DBr = new ArrayList();
 		DBr.add(tab1);
 		DBr.add(tab2);
 		DBr.add(tab3);
@@ -355,7 +527,7 @@ public class TesteTabMongo2 {
 		ins12.setForeignKey(foren12);
 		
 		
-		List<TabelaInsert> inserts = new ArrayList();
+		//List<TabelaInsert> inserts = new ArrayList();
 		inserts.add(ins1);
 		inserts.add(ins2);
 		inserts.add(ins3);
@@ -368,7 +540,7 @@ public class TesteTabMongo2 {
 		inserts.add(ins11);
 		
 		
-		List<String> respostas = new ArrayList(); 
+		/*List<String> respostas = new ArrayList(); 
 		respostas.add("inicio");
 		for(Tabela t: DBr){
 			String opcao = JOptionPane.showInputDialog(null,"Se a tabela: " + t.getNome() + "\n" + "for principal digite (s). Senão, digite (n).");
@@ -376,11 +548,50 @@ public class TesteTabMongo2 {
 				t.setPrincipal(true);
 			}
 		}
-		
+		*/
+		//System.out.println(ins12.getPrimaryKey());
 		TabelasParaMongo tabMong = new TabelasParaMongo(DBr, inserts);
+		
 		for(TabelaInsert t: inserts){
 			tabMong.criarDocumento(t);
 		}
+		
+		for(TabelaInsert t: inserts){
+			tabMong.estabelecerRelacionamentos2(t);			
+		}
+		
+		
+		/*MongoClientURI uri  = new MongoClientURI("mongodb://usuariomongo:secreto@ds061228.mongolab.com:61228/nosql_database");
+		MongoClient cliente = null;
+		try {
+			cliente = new MongoClient(uri);
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		DB db = cliente.getDB(uri.getDatabase());		
+		//---------------------------------------		
+		MongoDB mongo = new MongoDB();
+		DBCollection coll = mongo.colecaoDocumentos("T_PUBLICACAO");
+		BasicDBObject query = new BasicDBObject("_id", "002");
+		DBCursor cursor = coll.find(query);
+		
+		DBObject obj = cursor.next();
+		System.out.println(obj.get("_id"));
+		
+		DBCollection coll2 = mongo.colecaoDocumentos("T_PESSOA");
+		BasicDBObject query2 = new BasicDBObject(tab1.getPrimaryKey().toString().substring(1, tab1.getPrimaryKey().toString().length()-1), ins4.getPrimaryKey().get(0));
+		cursor = coll2.find(query2);
+		DBObject obj2 = cursor.next();
+		System.out.println(obj2.get("_id"));
+		
+		DBRef ref = new DBRef(db, "autores", obj2.get("_id"));
+		
+		//coll.update(query, obj2);
+		coll.update(new BasicDBObject("_id", obj.get("002")), new BasicDBObject("$set", new BasicDBObject("autores", ref)));
+		System.out.println(ref);
+		*/
+		
 		//System.out.println(tabMong.acharInsert(tab5, ins7));
 		
 		/*

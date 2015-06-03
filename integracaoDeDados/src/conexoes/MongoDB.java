@@ -8,10 +8,13 @@ import com.mongodb.*;
 
 
 public class MongoDB {
+	private MongoClientURI uri;
+	MongoClient cliente;
+	DB db;
 	
 	public DBCollection colecaoDocumentos(String colecao){
-		MongoClientURI uri  = new MongoClientURI("mongodb://usuariomongo:secreto@ds061228.mongolab.com:61228/nosql_database");
-	    MongoClient cliente = null;
+		uri  = new MongoClientURI("mongodb://usuariomongo:secreto@ds061228.mongolab.com:61228/nosql_database");
+	    cliente = null;
 	    
 	    try {
 			cliente = new MongoClient(uri);
@@ -19,7 +22,7 @@ public class MongoDB {
 			e.printStackTrace();
 		}
 	    
-	    DB db = cliente.getDB(uri.getDatabase());
+	    db = cliente.getDB(uri.getDatabase());
 	    DBCollection coll = db.getCollection(colecao);
 	    
 		return coll;
@@ -71,6 +74,30 @@ public class MongoDB {
 	    DBCollection coll = db.getCollection("Professores");
 	    
 		return coll;
+	}
+
+	public MongoClientURI getUri() {
+		return uri;
+	}
+
+	public void setUri(MongoClientURI uri) {
+		this.uri = uri;
+	}
+
+	public MongoClient getCliente() {
+		return cliente;
+	}
+
+	public void setCliente(MongoClient cliente) {
+		this.cliente = cliente;
+	}
+
+	public DB getDb() {
+		return db;
+	}
+
+	public void setDb(DB db) {
+		this.db = db;
 	}
 	
 }
