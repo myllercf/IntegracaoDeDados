@@ -7,9 +7,10 @@ public class TabelaInsert {
 	private List<String> primaryKey;
 	private List<String> atributos;
 	private List<String> foreignKey;
+	private boolean persistido;
 	
 	public TabelaInsert(){
-		
+		persistido = false;
 	}
 
 	public String getTabela() {
@@ -42,6 +43,14 @@ public class TabelaInsert {
 
 	public void setForeignKey(List<String> foreignKey) {
 		this.foreignKey = foreignKey;
+	}
+
+	public boolean isPersistido() {
+		return persistido;
+	}
+
+	public void setPersistido(boolean persistido) {
+		this.persistido = persistido;
 	}
 
 }

@@ -1,5 +1,6 @@
 package Conversao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Tabela {
@@ -8,10 +9,13 @@ public class Tabela {
 	private List<String> primaryKey;
 	private List<String> foreignKey;
 	private List<String> referencias;
-	private boolean principal;
+	private String classificacao;
 	
 	public Tabela(){
-		
+		campos = new ArrayList<String>();
+		primaryKey = new ArrayList<String>();
+		foreignKey = new ArrayList<String>();
+		referencias = new ArrayList<String>();
 	}
 
 	public String getNome() {
@@ -54,12 +58,12 @@ public class Tabela {
 		this.referencias = referencias;
 	}
 
-	public boolean isPrincipal() {
-		return principal;
+	public String getClassificacao() {
+		return classificacao;
 	}
 
-	public void setPrincipal(boolean principal) {
-		this.principal = principal;
+	public void setClassificacao(String classificacao) {
+		this.classificacao = classificacao;
 	}
 
 }

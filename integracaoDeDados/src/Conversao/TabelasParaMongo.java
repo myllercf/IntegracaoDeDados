@@ -3,10 +3,12 @@ package Conversao;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import com.mongodb.DBRef;
 
 import conexoes.MongoDB;
 
@@ -23,53 +25,117 @@ public class TabelasParaMongo {
 		this.instancias = instancias;
 	}
 	
-	
-	//buscar as ultimas tabelas
-	public List<Tabela> tabelasFinais(){
-		List<Tabela> ultimas = new ArrayList();
-		List<String> referencias = new ArrayList();
-		
-		for(Tabela tab: DBr){
-			if(tab.getReferencias() != null){
-				for(int i=0; i< tab.getReferencias().size(); i++){
-					referencias.add(tab.getReferencias().get(i));
-				}
+	public void conversao(TabelaInsert inst){
+		if(EhPrincipal(inst.getTabela()) && !inst.isPersistido()){
+			Tabela tabela = acharTabela(inst.getTabela());
+			for(int i=0; i<tabela.getCampos().size(); i++){
+				campos.add(tabela.getCampos().get(i));
+				atributos.add(inst.getAtributos().get(i));
 			}
+			navegarProfundidade(mensionaEstaTabela(tabela), inst);
 		}
-		for(Tabela tab2: DBr){
-			boolean temIgual = false;
-			for(String ref: referencias){
-				if(tab2.getNome().equals(ref)){
-					temIgual = true;
-				}
-			}
-			if(temIgual == false){
-				ultimas.add(tab2);
-			}
-		}
-		
-		return ultimas;
 	}
 	
+	public void navegarProfundidade(List<Tabela> tabelas, TabelaInsert inst){
+		for(Tabela t: tabelas){
+			do{
+				TabelaInsert in = acharInstanciaAbaixo(inst, t);
+				
+				switch(t.getClassificacao()){
+				case "comum":
+					for(int i=0; i<t.getCampos().size(); i++){
+						campos.add(t.getCampos().get(i));
+						atributos.add(in.getAtributos().get(i));
+					}
+					break;
+				case "subclasse":
+					for(int i=0; i<t.getCampos().size(); i++){
+						campos.add(t.getCampos().get(i));
+						atributos.add(in.getAtributos().get(i));
+					}
+					break;
+				default:
+					break;
+				}
+				
+				List<Tabela> lista = mensionaEstaTabela(t);
+				if(lista != null && !lista.isEmpty()){
+					navegarProfundidade(lista, in);
+				}else{
+					campos.add("tipo");
+					atributos.add(t.getNome());
+					break;
+				}
+			} while(true);
+		}
+	}
+	
+	public List<Tabela> obterPrincipais(){
+		List<Tabela> listagem = new ArrayList();
+		for(Tabela t: DBr){
+			if(t.getClassificacao().equals("principal")){
+				listagem.add(t);
+			}
+		}
+		return listagem;
+	}
+	
+	public List<Tabela> mensionaEstaTabela(Tabela t){
+		List<Tabela> tabelas = new ArrayList();
+		for(Tabela tab: DBr){
+			if(tab.getReferencias().contains(t)){
+				tabelas.add(tab);
+			}
+		}
+		return tabelas;
+	}
+	
+	public boolean EhPrincipal(String nome){
+		//boolean resposta = false;
+		for(Tabela t: DBr){
+			if(t.getNome().equals(nome)){
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public TabelaInsert acharInstanciaAbaixo(TabelaInsert inst, Tabela tab){
+		//TabelaInsert instancia = null;
+		for(TabelaInsert ins: instancias){
+			if(ins.getTabela().equals(tab) && ins.getForeignKey().contains(inst.getPrimaryKey())){
+				return ins;
+			}
+		}
+		return null;
+	}
+	
+	//--------------------------------------------------------------------------------------------------
 	
 	public void criarDocumento(TabelaInsert inst){
 		List<Tabela> ultimas = tabelasFinais();
 		String tipo = null;
 		
 		for(Tabela tab: ultimas){
-			if(inst.getTabela() == tab.getNome()){
+			if( (inst.getTabela() == tab.getNome()) && !(tab.getReferencias().size() >=2) ){
 				tipo = tab.getNome();
-				while(!tab.isPrincipal()){
+				if(!tab.getCampos().equals(null) && !tab.getCampos().isEmpty()){
 					for(int i=0; i<inst.getAtributos().size(); i++){
 						campos.add(tab.getCampos().get(i));
 						atributos.add(inst.getAtributos().get(i));
 					}
+				}
+				while(!tab.getClassificacao().equals("principal")){
+					/*for(int i=0; i<inst.getAtributos().size(); i++){
+						campos.add(tab.getCampos().get(i));
+						atributos.add(inst.getAtributos().get(i));
+					}*/
 					String chave = tab.getPrimaryKey().toString();
-					System.out.println(tab.getNome());
+					//System.out.println(tab.getNome());
 					tab = acharTabela(tab.getReferencias().get(0));
 					inst = acharInsert(tab, inst);
 					if(tab.getPrimaryKey().toString() != chave){
-						System.out.println("entra na checagem da chave");
+						//System.out.println("entra na checagem da chave");
 						campos.add(chave.substring(1, chave.length()-1));
 						atributos.add(inst.getPrimaryKey().get(0));
 					}
@@ -127,7 +193,121 @@ public class TabelasParaMongo {
 		return insert;
 	}
 	
-	public void estabelecerRelacionamentos(TabelaInsert instancia){
+	public void estabelecerRelacionamentos3(){
+		for(TabelaInsert instancia: instancias){
+			Tabela tabela = acharTabela(instancia.getTabela());
+			
+			if(tabela.getClassificacao().equals("principal") && !tabela.getReferencias().isEmpty()){
+				for(String ref: tabela.getReferencias()){
+					Tabela tab = acharTabela(ref);
+					if(tab.getClassificacao().equals("principal") && tab.getNome() != tabela.getNome()){
+						//passar DBRef para o documento
+						System.out.println("referencia direta entre tabelas");
+					}
+				}
+			}
+			else if(!tabela.getClassificacao().equals("principal") && tabela.getReferencias().size() >=2){
+				for(int i=0; i<instancia.getForeignKey().size(); i++){
+					Tabela tab1 = acharTabela(tabela.getReferencias().get(i));
+					if(tab1.getClassificacao().equals("principal")){
+						for(int j=0; j<instancia.getForeignKey().size(); j++){
+							Tabela tab2 = acharTabela(tabela.getReferencias().get(j));
+							if( tab2.getClassificacao().equals("principal") && !tabela.getForeignKey().get(i).equals(tabela.getForeignKey().get(j)) ){
+								
+								/*System.out.println("i: " + i + ", j: " + j);
+								System.out.println(tabela.getForeignKey().get(i));
+								System.out.println(instancia.getForeignKey().get(i));
+								System.out.println("---");
+								System.out.println(tabela.getForeignKey().get(j));
+								System.out.println(instancia.getForeignKey().get(j));
+								*/
+								
+								BasicDBObject query1 = new BasicDBObject(tabela.getForeignKey().get(i), instancia.getForeignKey().get(i));
+								BasicDBObject query2 = new BasicDBObject(tabela.getForeignKey().get(j), instancia.getForeignKey().get(j));
+								
+								DBCollection colecao1 = mongo.colecaoDocumentos(tab1.getNome());
+								DBCollection colecao2 = mongo.colecaoDocumentos(tab2.getNome());
+								
+								//System.out.println(query2);
+								DBCursor cursor1 = colecao1.find(query1);
+								DBCursor cursor2 = colecao2.find(query2);
+								
+								//System.out.println(cursor2);
+								
+								DBObject obj1 = cursor1.one();
+								DBObject obj2 = cursor2.one();
+								
+								DBRef ref = new DBRef(instancia.getForeignKey().get(j), obj2.get("_id"));
+								
+								BasicDBList lista = new BasicDBList();
+								
+								/*if(!obj1.get("relacionamentos").equals(null)){
+									lista = (BasicDBList) obj1.get("relacionamentos");
+								}*/
+								/*try{
+									lista = (BasicDBList) obj1.get("relacionamentos");
+								}catch(NullPointerException e){
+									
+								}
+								
+								//System.out.println("ref-> "+ref);
+								//System.out.println(obj1.get("relacionamentos"));
+								//System.out.println("lista-> "+lista);
+								//lista.add(ref);
+								lista.put(0, ref);
+								//lista(tab2.getNome(), ref);
+								//System.out.println("lista-> "+lista);
+								
+								DBObject atualizacao = obj1;
+								atualizacao.put("relacionamentos", lista);
+								
+								//collEdicao.update(new BasicDBObject("_id", obj.get("002")), new BasicDBObject("$set", new BasicDBObject("autores", ref)));
+								colecao1.findAndModify(query1, atualizacao);
+								*/
+								//roteiro: http://stackoverflow.com/questions/10054301/update-an-array-using-mongodb 
+								//http://stackoverflow.com/questions/13679265/update-a-list-field-in-mongodb-using-java
+								BasicDBObject up = new BasicDBObject();
+								up.put(tab2.getNome(), ref);
+								BasicDBObject inserir = new BasicDBObject("$push", new BasicDBObject("relacionamentos", up));
+								//colecao1.update(query1, inserir);
+								
+								System.out.println(ref);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	//buscar as ultimas tabelas
+		public List<Tabela> tabelasFinais(){
+			List<Tabela> ultimas = new ArrayList();
+			List<String> referencias = new ArrayList();
+			
+			for(Tabela tab: DBr){
+				if(tab.getReferencias() != null){
+					for(int i=0; i< tab.getReferencias().size(); i++){
+						referencias.add(tab.getReferencias().get(i));
+					}
+				}
+			}
+			for(Tabela tab2: DBr){
+				boolean temIgual = false;
+				for(String ref: referencias){
+					if(tab2.getNome().equals(ref)){
+						temIgual = true;
+					}
+				}
+				if(temIgual == false){
+					ultimas.add(tab2);
+				}
+			}
+			
+			return ultimas;
+		}
+	
+	/*public void estabelecerRelacionamentos(TabelaInsert instancia){
 		for(Tabela tab: DBr){
 			if(tab.isPrincipal() && tab.getReferencias() != null){
 				for(String ref: tab.getReferencias()){
@@ -144,10 +324,10 @@ public class TabelasParaMongo {
 							//while(cursor.hasNext()){
 								
 							//}
-							/*documento de instancia <- id da instancia de ref;
-							 * usando o DBRef -> https://jira.mongodb.org/browse/JAVA-607
-							 * API do DBCollection -> http://api.mongodb.org/java/current/com/mongodb/DBCollection.html
-							*/
+							//documento de instancia <- id da instancia de ref;
+							//usando o DBRef -> https://jira.mongodb.org/browse/JAVA-607
+							//API do DBCollection -> http://api.mongodb.org/java/current/com/mongodb/DBCollection.html
+							
 						}else{
 							for(String ref2: acharTabela(ref).getReferencias()){
 								if(ref2.equals(tab.getNome())){
@@ -163,13 +343,15 @@ public class TabelasParaMongo {
 	
 	public void estabelecerRelacionamentos2(TabelaInsert instancia){
 		Tabela tab = acharTabela(instancia.getTabela());
-		if(tab.isPrincipal() && tab.getReferencias() != null){
+		if(tab.isPrincipal() && !tab.getReferencias().equals(null) && !tab.getReferencias().isEmpty()){
 			for(String ref: tab.getReferencias()){
 				if(!ref.equals(tab.getNome())){
 					Tabela tab2 = acharTabela(ref);
 					
 					while(!tab2.isPrincipal()){
-						
+						tab2 = acharTabela(tab2.getReferencias().get(0));
+						//inst = acharInsert(tab, inst);
+						TabelaInsert inst = acharInsert(tab2, instancia);
 					}
 					if(tab2.isPrincipal()){
 						
@@ -191,7 +373,7 @@ public class TabelasParaMongo {
 				}
 			}
 		}
-	}
+	}*/
 	
 	public void adicionarNovoCampo(String dbName, String collName, String docID, String key, String value) {
 		mongo.getCliente().getDB(dbName).getCollection(collName).update(new BasicDBObject("_id", docID),

@@ -51,7 +51,7 @@ public class TesteTabMongo2 {
 				tab1x.setNome("T_PUBLICACAO");
 				tab1x.setCampos(camp1x);
 				tab1x.setPrimaryKey(primary1x);
-				tab1x.setPrincipal(true);
+				tab1x.setClassificacao("principal");
 				
 				//RELATORIO_TECNICO
 				List<String> camp2x = new ArrayList();
@@ -68,6 +68,7 @@ public class TesteTabMongo2 {
 				tab2x.setPrimaryKey(primary2x);
 				tab2x.setForeignKey(foreign2x);
 				tab2x.setReferencias(refs2x);
+				tab2x.setClassificacao("subclasse");
 				
 				//ARTIGO
 				List<String> camp3x = new ArrayList();
@@ -88,6 +89,7 @@ public class TesteTabMongo2 {
 				tab3x.setCampos(camp3x);
 				tab3x.setForeignKey(foreign3x);
 				tab3x.setReferencias(refs3x);
+				tab3x.setClassificacao("subclasse");
 				
 				//ARTIGO_CONFERENCIA
 				List<String> camp4x = new ArrayList();
@@ -106,12 +108,53 @@ public class TesteTabMongo2 {
 				tab4x.setPrimaryKey(primary4x);
 				tab4x.setForeignKey(foreign4x);
 				tab4x.setReferencias(refs4x);
+				tab4x.setClassificacao("subclasse");
+				
+				//ARTIGO_PERIODICO
+				List<String> camp6x = new ArrayList();
+				camp6x.add("nome_periodico");
+				camp6x.add("nro_edicao");
+				List<String> primary6x = new ArrayList();
+				primary6x.add("cod_publicacao");
+				List<String> foreign6x = new ArrayList();
+				foreign6x.add("cod_publicacao");
+				List<String> refs6x = new ArrayList();
+				refs6x.add("T_ARTIGO");		
+				Tabela tab6x = new Tabela(); 
+				tab6x.setNome("T_ARTIGO_PERIODICO");
+				tab6x.setCampos(camp6x);
+				tab6x.setPrimaryKey(primary6x);
+				tab6x.setForeignKey(foreign6x);
+				tab6x.setReferencias(refs6x);
+				tab6x.setClassificacao("subclasse");
+				
+				//CAPITULO_LIVRO
+				List<String> camp5x = new ArrayList();
+				camp5x.add("ISBN_livro");
+				camp5x.add("titulo_livro");
+				camp5x.add("editora_livro");
+				camp5x.add("edicao");
+				List<String> primary5x = new ArrayList();
+				primary5x.add("cod_publicacao");
+				List<String> foreign5x = new ArrayList();
+				foreign5x.add("cod_publicacao");
+				List<String> refs5x = new ArrayList();
+				refs5x.add("T_PUBLICACAO");		
+				Tabela tab5x = new Tabela(); 
+				tab5x.setNome("T_CAPITULO_LIVRO");
+				tab5x.setCampos(camp5x);
+				tab5x.setPrimaryKey(primary5x);
+				tab5x.setForeignKey(foreign5x);
+				tab5x.setReferencias(refs5x);
+				tab5x.setClassificacao("subclasse");
 				
 				List<Tabela> DBr = new ArrayList();
 				DBr.add(tab1x);
 				DBr.add(tab2x);
 				DBr.add(tab3x);
 				DBr.add(tab4x);
+				DBr.add(tab5x);
+				DBr.add(tab6x);
 				
 				
 				//inserts Publicacao
@@ -138,6 +181,30 @@ public class TesteTabMongo2 {
 						ins2x.setTabela("T_PUBLICACAO");
 						ins2x.setAtributos(campPub2x);
 						ins2x.setPrimaryKey(prima2x);
+						
+						List<String> campPub6x = new ArrayList();
+						campPub6x.add("Arquitetura de SGBD");
+						campPub6x.add("09");
+						campPub6x.add("2003");
+						campPub6x.add(null);
+						List<String> prima6x = new ArrayList();
+						prima6x.add("004");
+						TabelaInsert ins6x = new TabelaInsert();
+						ins6x.setTabela("T_PUBLICACAO");
+						ins6x.setAtributos(campPub6x);
+						ins6x.setPrimaryKey(prima6x);
+						
+						List<String> campPub8x = new ArrayList();
+						campPub8x.add("Algoritmo de ordenacao logn");
+						campPub8x.add("02");
+						campPub8x.add("2002");
+						campPub8x.add(null);
+						List<String> prima8x = new ArrayList();
+						prima8x.add("005");
+						TabelaInsert ins8x = new TabelaInsert();
+						ins8x.setTabela("T_PUBLICACAO");
+						ins8x.setAtributos(campPub8x);
+						ins8x.setPrimaryKey(prima8x);
 						
 						//insert T_RELATORIO_TECNICO
 						List<String> relax = new ArrayList();
@@ -169,6 +236,22 @@ public class TesteTabMongo2 {
 						ins4x.setPrimaryKey(primaartx);
 						ins4x.setForeignKey(fore4x);
 						
+						List<String> capart2x = new ArrayList();
+						capart2x.add("3");
+						capart2x.add("50");
+						capart2x.add("57");
+						capart2x.add("N");
+						capart2x.add("A");
+						List<String> primaart2x = new ArrayList();
+						primaart2x.add("005");
+						List<String> fore4x2 = new ArrayList();
+						fore4x2.add("005");
+						TabelaInsert ins4x2 = new TabelaInsert();
+						ins4x2.setTabela("T_ARTIGO");
+						ins4x2.setAtributos(capart2x);
+						ins4x2.setPrimaryKey(primaart2x);
+						ins4x2.setForeignKey(fore4x2);
+						
 						//insert T_ARTIGO_CONFERENCIA
 						List<String> conf1x = new ArrayList();
 						conf1x.add("Internation Conference on Database Sysstems");
@@ -184,12 +267,47 @@ public class TesteTabMongo2 {
 						ins5x.setPrimaryKey(primaconfx);
 						ins5x.setForeignKey(fore2x);
 						
+						//insert T_ARTIGO_PERIODICO
+						List<String> conf2x = new ArrayList();
+						conf2x.add("Algoritmos");
+						conf2x.add("5");
+						List<String> primaconf2x = new ArrayList();
+						primaconf2x.add("005");
+						List<String> fore2x2 = new ArrayList();
+						fore2x2.add("005");
+						TabelaInsert ins5x2 = new TabelaInsert();
+						ins5x2.setTabela("T_ARTIGO_PERIODICO");
+						ins5x2.setAtributos(conf2x);
+						ins5x2.setPrimaryKey(primaconf2x);
+						ins5x2.setForeignKey(fore2x2);
+						
+						//inser T_CAPITULO_LIVRO
+						List<String> conf7x = new ArrayList();
+						conf7x.add("1234569870");
+						conf7x.add("Fundamentos de banco de dados");
+						conf7x.add("Springer");
+						conf7x.add("2");
+						List<String> primaconf7x = new ArrayList();
+						primaconf7x.add("004");
+						List<String> fore7x = new ArrayList();
+						fore7x.add("004");
+						TabelaInsert ins7x = new TabelaInsert();
+						ins7x.setTabela("T_CAPITULO_LIVRO");
+						ins7x.setAtributos(conf7x);
+						ins7x.setPrimaryKey(primaconf7x);
+						ins7x.setForeignKey(fore7x);
+						
 						List<TabelaInsert> inserts = new ArrayList();
 						inserts.add(ins1x);
 						inserts.add(ins2x);
 						inserts.add(ins3x);
 						inserts.add(ins4x);
-						inserts.add(ins5x);		
+						inserts.add(ins5x);
+						inserts.add(ins6x);
+						inserts.add(ins7x);
+						inserts.add(ins8x);
+						inserts.add(ins4x2);
+						inserts.add(ins5x2);
 		
 				
 		//-----------------------------
@@ -214,7 +332,7 @@ public class TesteTabMongo2 {
 		tab1.setCampos(camp1);
 		tab1.setPrimaryKey(prima1);
 		tab1.setNome("T_PESSOA");
-		tab1.setPrincipal(true);
+		tab1.setClassificacao("principal");
 		//tab1.setPrincipal(true);
 		
 		//Aluno
@@ -232,6 +350,7 @@ public class TesteTabMongo2 {
 		tab2.setForeignKey(fore2);
 		tab2.setReferencias(refe2);
 		tab2.setNome("T_ALUNO");
+		tab2.setClassificacao("subclasse");
 		
 		//Mestrando
 		List<String> camp3 = new ArrayList(); 
@@ -250,6 +369,7 @@ public class TesteTabMongo2 {
 		tab3.setForeignKey(fore3);
 		tab3.setReferencias(refe3);
 		tab3.setNome("T_MESTRANDO");
+		tab3.setClassificacao("subclasse");
 		
 		//Doutorando
 		List<String> camp4 = new ArrayList(); 
@@ -268,6 +388,7 @@ public class TesteTabMongo2 {
 		tab4.setForeignKey(fore4);
 		tab4.setReferencias(refe4);
 		tab4.setNome("T_DOUTORANDO");
+		tab4.setClassificacao("subclasse");
 		
 		//Professor
 		List<String> camp5 = new ArrayList(); 
@@ -284,6 +405,7 @@ public class TesteTabMongo2 {
 		tab5.setForeignKey(fore5);
 		tab5.setReferencias(refe5);
 		tab5.setNome("T_PROFESSOR");
+		tab5.setClassificacao("subclasse");
 		
 		//Professor IC
 		List<String> camp6 = new ArrayList(); 
@@ -301,6 +423,7 @@ public class TesteTabMongo2 {
 		tab6.setForeignKey(fore6);
 		tab6.setReferencias(refe6);
 		tab6.setNome("T_PROFESSOR_IC");
+		tab6.setClassificacao("subclasse");
 		
 		//Professor Visitante
 		List<String> camp7 = new ArrayList(); 
@@ -318,6 +441,7 @@ public class TesteTabMongo2 {
 		tab7.setForeignKey(fore7);
 		tab7.setReferencias(refe7);
 		tab7.setNome("T_PROFESSOR_VISITANTE");
+		tab7.setClassificacao("subclasse");
 		
 		
 		//List<Tabela> DBr = new ArrayList();
@@ -539,6 +663,62 @@ public class TesteTabMongo2 {
 		inserts.add(ins12);
 		inserts.add(ins11);
 		
+		//------------------------------ // ---------------------------
+		//Tabela T_PESSOA_X_PUBLICACAO
+		List<String> prima8 = new ArrayList();
+		prima8.add("cpf");
+		prima8.add("cod_publicacao");
+		List<String> fore8 = new ArrayList();
+		fore8.add("cpf");
+		fore8.add("cod_publicacao");
+		List<String> refe8 = new ArrayList();
+		refe8.add("T_PESSOA");
+		refe8.add("T_PUBLICACAO");
+		Tabela tab8 = new Tabela();
+		tab8.setNome("T_PESSOA_X_PUBLICACAO");
+		tab8.setPrimaryKey(prima8);
+		tab8.setForeignKey(fore8);
+		tab8.setReferencias(refe8);
+		tab8.setClassificacao("relacionamento");
+		
+		DBr.add(tab8);
+		
+		List<String> primar13 = new ArrayList();
+		primar13.add("98632541754");
+		primar13.add("004");
+		List<String> foren13 = new ArrayList();
+		foren13.add("98632541754");
+		foren13.add("004");
+		TabelaInsert ins13 = new TabelaInsert();
+		ins13.setTabela("T_PESSOA_X_PUBLICACAO");
+		ins13.setPrimaryKey(primar13);
+		ins13.setForeignKey(foren13);
+		
+		List<String> primar14 = new ArrayList();
+		primar14.add("98632541754");
+		primar14.add("005");
+		List<String> foren14 = new ArrayList();
+		foren14.add("98632541754");
+		foren14.add("005");
+		TabelaInsert ins14 = new TabelaInsert();
+		ins14.setTabela("T_PESSOA_X_PUBLICACAO");
+		ins14.setPrimaryKey(primar14);
+		ins14.setForeignKey(foren14);
+		
+		inserts.add(ins13);
+		inserts.add(ins14);
+		
+		/*List<String> primar14 = new ArrayList();
+		primar14.add("");
+		primar14.add("");
+		List<String> foren14 = new ArrayList();
+		foren14.add("");
+		foren14.add("");
+		TabelaInsert ins14 = new TabelaInsert();
+		ins14.setTabela("T_PESSOA_X_PUBLICACAO");
+		ins14.setPrimaryKey(primar14);
+		ins14.setForeignKey(foren14);
+		*/
 		
 		/*List<String> respostas = new ArrayList(); 
 		respostas.add("inicio");
@@ -550,15 +730,18 @@ public class TesteTabMongo2 {
 		}
 		*/
 		//System.out.println(ins12.getPrimaryKey());
+		
+		
 		TabelasParaMongo tabMong = new TabelasParaMongo(DBr, inserts);
 		
 		for(TabelaInsert t: inserts){
 			tabMong.criarDocumento(t);
 		}
 		
-		for(TabelaInsert t: inserts){
+		/*for(TabelaInsert t: inserts){
 			tabMong.estabelecerRelacionamentos2(t);			
-		}
+		}*/
+		tabMong.estabelecerRelacionamentos3();
 		
 		
 		/*MongoClientURI uri  = new MongoClientURI("mongodb://usuariomongo:secreto@ds061228.mongolab.com:61228/nosql_database");
@@ -591,6 +774,7 @@ public class TesteTabMongo2 {
 		coll.update(new BasicDBObject("_id", obj.get("002")), new BasicDBObject("$set", new BasicDBObject("autores", ref)));
 		System.out.println(ref);
 		*/
+		
 		
 		//System.out.println(tabMong.acharInsert(tab5, ins7));
 		

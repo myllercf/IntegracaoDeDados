@@ -19,7 +19,7 @@ public class TesteTabMongo {
 		tab1.setNome("T_PUBLICACAO");
 		tab1.setCampos(camp1);
 		tab1.setPrimaryKey(primary1);
-		tab1.setPrincipal(true);
+		tab1.setClassificacao("principal");
 		
 		//RELATORIO_TECNICO
 		List<String> camp2 = new ArrayList();
