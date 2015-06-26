@@ -14,11 +14,13 @@ import conexoes.MongoDB;
 
 public class TabelasParaMongo {
 	List<Tabela> DBr;
-	List<TabelaInsert> instancias;
+	List<TabelaInsert> instancias, relacionamento1, relacionamento2;
 	List<Tabela> entidades = new ArrayList();
 	List<String> campos = new ArrayList();
 	List<String> atributos = new ArrayList();
 	MongoDB mongo = new MongoDB();
+	String colecaoMongo;
+	TabelaInsert instanciaConversao;
 	
 	public TabelasParaMongo(List<Tabela> DBr, List<TabelaInsert> instancias){
 		this.DBr = DBr;
@@ -28,53 +30,192 @@ public class TabelasParaMongo {
 	public void conversao(TabelaInsert inst){
 		if(EhPrincipal(inst.getTabela()) && !inst.isPersistido()){
 			Tabela tabela = acharTabela(inst.getTabela());
-			for(int i=0; i<tabela.getCampos().size(); i++){
-				campos.add(tabela.getCampos().get(i));
-				atributos.add(inst.getAtributos().get(i));
+			for(int i=0; i<tabela.getPrimaryKey().size(); i++){
+				if(inst.getPrimaryKey().get(i) != null){
+					campos.add(tabela.getPrimaryKey().get(i));
+					atributos.add(inst.getPrimaryKey().get(i));
+				}
 			}
-			navegarProfundidade(mensionaEstaTabela(tabela), inst);
+			for(int i=0; i<tabela.getCampos().size(); i++){
+				if(inst.getAtributos().get(i) != null){
+					campos.add(tabela.getCampos().get(i));
+					atributos.add(inst.getAtributos().get(i));
+				}
+			}
+			colecaoMongo = inst.getTabela();
+			instanciaConversao = inst;
+			navegarProfundidade(inst);
 		}
 	}
 	
-	public void navegarProfundidade(List<Tabela> tabelas, TabelaInsert inst){
-		for(Tabela t: tabelas){
-			do{
-				TabelaInsert in = acharInstanciaAbaixo(inst, t);
-				
-				switch(t.getClassificacao()){
-				case "comum":
-					for(int i=0; i<t.getCampos().size(); i++){
-						campos.add(t.getCampos().get(i));
+	
+	public void navegarProfundidade(TabelaInsert inst) {
+		TabelaInsert in = acharInstanciaAbaixo(inst);
+		Tabela tab = acharTabela(in.getTabela());
+		if (in != null && !in.isPersistido()) {
+			switch (tab.getClassificacao()) {
+			case "comum":
+				for (int j = 0; j < tab.getPrimaryKey().size(); j++) {
+					if (inst.getPrimaryKey().get(j) != null) {
+						if (!campos.contains(tab.getPrimaryKey().get(j))) {
+							campos.add(tab.getPrimaryKey().get(j));
+							atributos.add(inst.getPrimaryKey().get(j));
+						}
+					}
+				}
+				for (int i = 0; i < tab.getCampos().size(); i++) {
+					if (in.getAtributos().get(i) != null) {
+						campos.add(tab.getCampos().get(i));
 						atributos.add(in.getAtributos().get(i));
 					}
-					break;
-				case "subclasse":
-					for(int i=0; i<t.getCampos().size(); i++){
-						campos.add(t.getCampos().get(i));
+				}
+				in.setPersistido(true);
+				break;
+			case "subclasse":
+				for (int j = 0; j < tab.getPrimaryKey().size(); j++) {
+					if (inst.getPrimaryKey().get(j) != null) {
+						if (!campos.contains(tab.getPrimaryKey().get(j))) {
+							campos.add(tab.getPrimaryKey().get(j));
+							atributos.add(in.getPrimaryKey().get(j));
+						}
+					}
+				}
+				for (int i = 0; i < tab.getCampos().size(); i++) {
+					if (in.getAtributos().get(i) != null) {
+						campos.add(tab.getCampos().get(i));
 						atributos.add(in.getAtributos().get(i));
 					}
-					break;
-				default:
-					break;
 				}
-				
-				List<Tabela> lista = mensionaEstaTabela(t);
-				if(lista != null && !lista.isEmpty()){
-					navegarProfundidade(lista, in);
-				}else{
-					campos.add("tipo");
-					atributos.add(t.getNome());
-					break;
-				}
-			} while(true);
+				in.setPersistido(true);
+				break;
+			default:
+				break;
+			}
+			List<Tabela> lista = mensionaEstaTabela(tab);
+			if (lista != null && !lista.isEmpty()) {
+				navegarProfundidade(in);
+			} else {
+				campos.add("tipo");
+				atributos.add(tab.getNome());
+				navegarAcima(instanciaConversao);
+			}
 		}
 	}
 	
-	public List<Tabela> obterPrincipais(){
+	//fazer mais testes
+	public void navegarAcima(TabelaInsert instancia) {
+		Tabela tabela = acharTabela(instancia.getTabela());
+		if (tabela.getReferencias() != null && !tabela.getReferencias().isEmpty()) {
+			for (String ref : tabela.getReferencias()) {
+				Tabela tab = acharTabela(ref);
+				TabelaInsert inst = acharInsert(tab, instancia);// testar aqui
+				if (inst != null && !inst.isPersistido()) {
+					switch (tab.getClassificacao()) {
+					case "comum":
+						for (int j = 0; j < inst.getPrimaryKey().size(); j++) {
+							if (inst.getPrimaryKey().get(j) != null) {
+								if (!campos.contains(tab.getPrimaryKey().get(j))) {
+									campos.add(tab.getPrimaryKey().get(j));
+									atributos.add(inst.getPrimaryKey().get(j));
+								}
+							}
+						}
+						for (int i = 0; i < inst.getAtributos().size(); i++) {
+							if (inst.getAtributos().get(i) != null) {
+								campos.add(tab.getCampos().get(i));
+								atributos.add(inst.getAtributos().get(i));
+							}
+						}
+						inst.setPersistido(true);
+						break;
+					case "subclasse":
+						// navegar ate o topo e pegar o dbref
+						inst.setPersistido(true);
+						break;
+					case "principal":
+						relacionamento1.add(instanciaConversao);
+						relacionamento2.add(inst);//continuaaa
+						// inst.setPersistido(true);
+						break;
+					default:
+						break;
+					}
+					if (tab.getReferencias() != null
+							&& !tab.getReferencias().isEmpty()) {
+						navegarAcima(inst);
+					} else {
+						for (int i = 0; i < atributos.size(); i++) {
+							MongoDB mongo = new MongoDB();
+							DBCollection coll = mongo
+									.colecaoDocumentos(colecaoMongo);
+							String concat = inst.getPrimaryKey().toString();
+							BasicDBObject doc = new BasicDBObject();
+
+							for (int j = 0; j < atributos.size(); j++) {
+								if (atributos.get(j) != null) {
+									doc.append(campos.get(j), atributos.get(j));
+									System.out.println(campos.get(j));
+									System.out.println(atributos.get(j));
+									System.out.println("----------------");
+								}
+							}
+							coll.insert(doc);
+							campos.clear();
+							atributos.clear();
+						}
+					}
+				}
+			}
+		} else {
+			for (int i = 0; i < atributos.size(); i++) {
+				MongoDB mongo = new MongoDB();
+				DBCollection coll = mongo
+						.colecaoDocumentos(colecaoMongo);
+				String concat = instancia.getPrimaryKey().toString();
+				BasicDBObject doc = new BasicDBObject();
+
+				for (int j = 0; j < atributos.size(); j++) {
+					if (atributos.get(j) != null) {
+						doc.append(campos.get(j), atributos.get(j));
+						System.out.println(campos.get(j));
+						System.out.println(atributos.get(j));
+						System.out.println("----------------");
+					}
+				}
+				coll.insert(doc);
+				campos.clear();
+				atributos.clear();
+			}
+		}
+	}
+	
+	
+	public void relacionamentoUmPara(){
+		List<String> tabelas = obterPrincipais();
+		for(TabelaInsert insert: instancias){
+			if(tabelas.contains(insert.getTabela())){
+				
+			}
+		}
+	}
+	
+	
+	/*public List<Tabela> obterPrincipais(){
 		List<Tabela> listagem = new ArrayList();
 		for(Tabela t: DBr){
 			if(t.getClassificacao().equals("principal")){
 				listagem.add(t);
+			}
+		}
+		return listagem;
+	}*/
+	
+	//outra abordagem. olhar o switch "principal" de navegarAcima
+	public List<String> obterPrincipais(){
+		List<String> listagem = new ArrayList();
+		for(Tabela t: DBr){
+			if(t.getClassificacao().equals("principal")){
+				listagem.add(t.getNome());
 			}
 		}
 		return listagem;
@@ -83,7 +224,7 @@ public class TabelasParaMongo {
 	public List<Tabela> mensionaEstaTabela(Tabela t){
 		List<Tabela> tabelas = new ArrayList();
 		for(Tabela tab: DBr){
-			if(tab.getReferencias().contains(t)){
+			if(tab.getReferencias().contains(t.getNome())){
 				tabelas.add(tab);
 			}
 		}
@@ -91,20 +232,22 @@ public class TabelasParaMongo {
 	}
 	
 	public boolean EhPrincipal(String nome){
-		//boolean resposta = false;
 		for(Tabela t: DBr){
-			if(t.getNome().equals(nome)){
+			if(t.getNome().equals(nome) && t.getClassificacao().equals("principal")){
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	public TabelaInsert acharInstanciaAbaixo(TabelaInsert inst, Tabela tab){
-		//TabelaInsert instancia = null;
-		for(TabelaInsert ins: instancias){
-			if(ins.getTabela().equals(tab) && ins.getForeignKey().contains(inst.getPrimaryKey())){
-				return ins;
+	public TabelaInsert acharInstanciaAbaixo(TabelaInsert inst){
+		for(Tabela t: DBr){
+			if(t.getReferencias().contains(inst.getTabela())){
+				for(TabelaInsert i: instancias){
+					if(i.getForeignKey() != null && i.getTabela().equals(t.getNome()) && i.getForeignKey().equals(inst.getPrimaryKey())){
+						return i;
+					}
+				}
 			}
 		}
 		return null;
