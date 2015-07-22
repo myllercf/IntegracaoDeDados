@@ -307,13 +307,14 @@ public class TesteTabMongo3 {
 		camp1.add("usuario");
 		camp1.add("senha");
 		camp1.add("perfil");
+		camp1.add("tipo");
 		List<String> prima1 = new ArrayList();
 		prima1.add("cpf");
 		Tabela tab1 = new Tabela();
 		tab1.setCampos(camp1);
 		tab1.setPrimaryKey(prima1);
 		tab1.setNome("T_PESSOA");
-		tab1.setClassificacao("comum");
+		tab1.setClassificacao("principal");
 		// tab1.setPrincipal(true);
 
 		// Aluno
@@ -331,7 +332,7 @@ public class TesteTabMongo3 {
 		tab2.setForeignKey(fore2);
 		tab2.setReferencias(refe2);
 		tab2.setNome("T_ALUNO");
-		tab2.setClassificacao("principal");
+		tab2.setClassificacao("subclasse");
 
 		// Mestrando
 		List<String> camp3 = new ArrayList();
@@ -349,7 +350,7 @@ public class TesteTabMongo3 {
 		tab3.setPrimaryKey(prima3);
 		tab3.setForeignKey(fore3);
 		tab3.setReferencias(refe3);
-		tab3.setNome("T_MESTRANDO");
+		tab3.setNome("TMESTRANDO");
 		tab3.setClassificacao("subclasse");
 
 		// Doutorando
@@ -368,7 +369,7 @@ public class TesteTabMongo3 {
 		tab4.setPrimaryKey(prima4);
 		tab4.setForeignKey(fore4);
 		tab4.setReferencias(refe4);
-		tab4.setNome("T_DOUTORANDO");
+		tab4.setNome("TDOUTORANDO");
 		tab4.setClassificacao("subclasse");
 
 		// Professor
@@ -386,7 +387,7 @@ public class TesteTabMongo3 {
 		tab5.setForeignKey(fore5);
 		tab5.setReferencias(refe5);
 		tab5.setNome("T_PROFESSOR");
-		tab5.setClassificacao("principal");
+		tab5.setClassificacao("subclasse");
 
 		// Professor IC
 		List<String> camp6 = new ArrayList();
@@ -716,21 +717,21 @@ public class TesteTabMongo3 {
 		inserts.add(ins13);
 		inserts.add(ins14);
 		
-		TabelasParaMongo tabMong = new TabelasParaMongo(DBr, inserts);
-		//tabMong.conversao(ins3);
-		for(TabelaInsert in: inserts){
-			tabMong.conversao(in);
-			//tabMong.navegarAcima(in);
-		}
+		Insercoes insercoes = new Insercoes();
 		
-		//tabMong.navegarProfundidade(ins3);
-		//tabMong.navegarAcima(ins3);
-		/*Tabela tx = tabMong.acharTabela(ins3.getTabela());
-		Tabela t = tabMong.acharTabela(tx.getReferencias().get(0));
-		TabelaInsert i = tabMong.acharInsert(t, ins3);
-		System.out.println(i.getTabela());
-		System.out.println(i.getAtributos().get(4));*/
+		//TabelasParaMongo tabMong = new TabelasParaMongo(DBr, inserts);
+		TabelasParaMongo tabMong = new TabelasParaMongo(DBr, insercoes.getInstancias());
+		//tabMong.conversao(ins3);
+		for(TabelaInsert in: insercoes.getInstancias()){
+			tabMong.conversao(in);
+		}
 
+		tabMong.muitosParaMuitos();
+		//System.out.println(insercoes.getInstancias().get(5).getPrimaryKey());
+		//System.out.println(tabMong.acharInstanciaAbaixo(ins1x));
+		//System.out.println(tabMong.acharInstanciaAbaixo(insercoes.getInstancias().get(5)).getTabela());
+		//TabelaInsert i = tabMong.acharInstanciaAbaixo(insercoes.getInstancias().get(5));
+		//System.out.println(tabMong.acharInstanciaAbaixo(i));;
 	}
 
 }

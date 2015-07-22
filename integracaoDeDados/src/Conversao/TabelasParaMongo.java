@@ -51,55 +51,63 @@ public class TabelasParaMongo {
 	
 	public void navegarProfundidade(TabelaInsert inst) {
 		TabelaInsert in = acharInstanciaAbaixo(inst);
-		Tabela tab = acharTabela(in.getTabela());
-		if (in != null && !in.isPersistido()) {
-			switch (tab.getClassificacao()) {
-			case "comum":
-				for (int j = 0; j < tab.getPrimaryKey().size(); j++) {
-					if (inst.getPrimaryKey().get(j) != null) {
-						if (!campos.contains(tab.getPrimaryKey().get(j))) {
-							campos.add(tab.getPrimaryKey().get(j));
-							atributos.add(inst.getPrimaryKey().get(j));
+		if(in != null){
+			Tabela tab = acharTabela(in.getTabela());
+			if (in != null && !in.isPersistido()) {
+				switch (tab.getClassificacao()) {
+				case "comum":
+					for (int j = 0; j < tab.getPrimaryKey().size(); j++) {
+						if (inst.getPrimaryKey().get(j) != null) {
+							if (!campos.contains(tab.getPrimaryKey().get(j))) {
+								campos.add(tab.getPrimaryKey().get(j));
+								atributos.add(inst.getPrimaryKey().get(j));
+							}
 						}
 					}
-				}
-				for (int i = 0; i < tab.getCampos().size(); i++) {
-					if (in.getAtributos().get(i) != null) {
-						campos.add(tab.getCampos().get(i));
-						atributos.add(in.getAtributos().get(i));
-					}
-				}
-				in.setPersistido(true);
-				break;
-			case "subclasse":
-				for (int j = 0; j < tab.getPrimaryKey().size(); j++) {
-					if (inst.getPrimaryKey().get(j) != null) {
-						if (!campos.contains(tab.getPrimaryKey().get(j))) {
-							campos.add(tab.getPrimaryKey().get(j));
-							atributos.add(in.getPrimaryKey().get(j));
+					for (int i = 0; i < tab.getCampos().size(); i++) {
+						if (in.getAtributos().get(i) != null) {
+							campos.add(tab.getCampos().get(i));
+							atributos.add(in.getAtributos().get(i));
 						}
 					}
-				}
-				for (int i = 0; i < tab.getCampos().size(); i++) {
-					if (in.getAtributos().get(i) != null) {
-						campos.add(tab.getCampos().get(i));
-						atributos.add(in.getAtributos().get(i));
+					in.setPersistido(true);
+					break;
+				case "subclasse":
+					for (int j = 0; j < tab.getPrimaryKey().size(); j++) {
+						if (inst.getPrimaryKey().get(j) != null) {
+							if (!campos.contains(tab.getPrimaryKey().get(j))) {
+								campos.add(tab.getPrimaryKey().get(j));
+								atributos.add(in.getPrimaryKey().get(j));
+							}
+						}
 					}
+					for (int i = 0; i < tab.getCampos().size(); i++) {
+						if (in.getAtributos().get(i) != null) {
+							campos.add(tab.getCampos().get(i));
+							atributos.add(in.getAtributos().get(i));
+						}
+					}
+					in.setPersistido(true);
+					break;
+				default:
+					break;
 				}
-				in.setPersistido(true);
-				break;
-			default:
-				break;
-			}
-			List<Tabela> lista = mensionaEstaTabela(tab);
-			if (lista != null && !lista.isEmpty()) {
-				navegarProfundidade(in);
-			} else {
-				campos.add("tipo");
-				atributos.add(tab.getNome());
-				navegarAcima(instanciaConversao);
+				List<Tabela> lista = mensionaEstaTabela(tab);
+				if (lista != null && !lista.isEmpty()) {
+					navegarProfundidade(in);
+				} else {
+					//campos.add("tipo");
+					//atributos.add(tab.getNome());
+					navegarAcima(instanciaConversao);
+				}
 			}
 		}
+		else{
+			//campos.add("tipo");
+			//atributos.add(inst.getTabela());
+			navegarAcima(instanciaConversao);
+		}
+		
 	}
 	
 	//fazer mais testes
@@ -137,6 +145,9 @@ public class TabelasParaMongo {
 						relacionamento2.add(inst);//continuaaa
 						// inst.setPersistido(true);
 						break;
+					case "relacionamento":
+						//relacionamento1.add(instanciaConversao);
+						//relacionamento2.add(inst);
 					default:
 						break;
 					}
@@ -251,6 +262,75 @@ public class TabelasParaMongo {
 			}
 		}
 		return null;
+	}
+	
+	public void relacionamentos(){
+		for(int i=0; i<relacionamento2.size(); i++){
+			Tabela t = acharTabela(relacionamento2.get(i).getTabela());
+			if(t.getClassificacao().getClass().equals("relacionamento")){
+				
+			}
+		}
+	}
+	
+	public void muitosParaMuitos(){
+		for(TabelaInsert instancia: instancias){
+			for(Tabela tabela: DBr){
+				if(tabela.getClassificacao().equals("relacionamento") && tabela.getNome().equals(instancia.getTabela())){
+					
+					for(int i=0; i<instancia.getForeignKey().size(); i++){
+						Tabela tab1 = acharTabela(tabela.getReferencias().get(i));
+						
+						switch(tab1.getClassificacao()){
+						case "principal":
+							for(int j=0; j<instancia.getForeignKey().size(); j++){
+								Tabela tab2 = acharTabela(tabela.getReferencias().get(j));
+								
+								if(!tabela.getForeignKey().get(i).equals(tabela.getForeignKey().get(j))){
+									switch(tab2.getClassificacao()){
+									case "principal":
+										BasicDBObject query1 = new BasicDBObject(tabela.getForeignKey().get(i), instancia.getForeignKey().get(i));
+										BasicDBObject query2 = new BasicDBObject(tabela.getForeignKey().get(j), instancia.getForeignKey().get(j));
+										
+										DBCollection colecao1 = mongo.colecaoDocumentos(tab1.getNome());
+										DBCollection colecao2 = mongo.colecaoDocumentos(tab2.getNome());
+										
+										DBCursor cursor1 = colecao1.find(query1);
+										DBCursor cursor2 = colecao2.find(query2);
+										
+										DBObject obj1 = cursor1.one();
+										DBObject obj2 = cursor2.one();
+										
+										DBRef ref = new DBRef(tab2.getNome(), obj2.get("_id"));
+										BasicDBObject up = new BasicDBObject();
+										up.put(tab2.getNome(), ref);//rodar
+										BasicDBObject inserir = new BasicDBObject("$push", new BasicDBObject(tabela.getNome(), up));
+										colecao1.update(query1, inserir);
+										
+										System.out.println(ref);
+										break;
+									case "subclasse":
+										break;
+									case "comum":
+										break;
+									}
+								}
+							}
+							
+							break;
+						
+						case "subclasse":
+							//sobe na hierarquia
+							break;
+						
+						case "comum":
+							//pega os atributos
+							break;
+						}
+					}
+				}
+			}
+		}
 	}
 	
 	//--------------------------------------------------------------------------------------------------
@@ -412,7 +492,7 @@ public class TabelasParaMongo {
 								BasicDBObject up = new BasicDBObject();
 								up.put(tab2.getNome(), ref);
 								BasicDBObject inserir = new BasicDBObject("$push", new BasicDBObject("relacionamentos", up));
-								//colecao1.update(query1, inserir);
+								colecao1.update(query1, inserir);
 								
 								System.out.println(ref);
 							}
